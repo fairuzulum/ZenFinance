@@ -53,9 +53,19 @@ export const addWallet = async (userId: string, wallet: Omit<Wallet, 'id'>) => {
 
 // --- Transactions ---
 export const getTransactions = async (userId: string): Promise<Transaction[]> => {
-  const q = query(collection(db, `users/${userId}/transactions`), orderBy('date', 'desc'), orderBy('time', 'desc'));
+  // FIXED: Only sort by date in Firestore to prevent "Missing Index" error.
+  // We will sort by time on the client side.
+  const q = query(collection(db, `users/${userId}/transactions`), orderBy('date', 'desc'));
+  
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+  const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Transaction));
+
+  // Client-side sorting for time to ensure correct order within the same day
+  return data.sort((a, b) => {
+    if (a.date !== b.date) return 0; // Let Firestore sort order stand if dates differ (though desc means logic handled)
+    // If dates are same, compare time descending (latest time first)
+    return b.time.localeCompare(a.time);
+  });
 };
 
 export const addTransaction = async (userId: string, transaction: Omit<Transaction, 'id'>) => {

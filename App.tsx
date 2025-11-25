@@ -26,7 +26,7 @@ import { Goals } from './pages/Goals';
 import { Debts } from './pages/Debts';
 import { User } from 'firebase/auth';
 import { Button } from './components/ui/Button';
-import { ShieldAlert, Wallet as WalletIcon, LogIn } from 'lucide-react';
+import { ShieldAlert, Wallet as WalletIcon, LogIn, WifiOff } from 'lucide-react';
 import { format } from 'date-fns';
 
 const ALLOWED_EMAIL = "usleunmdi32@gmail.com";
@@ -42,18 +42,23 @@ export default function App() {
   
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState('');
+  const [dataError, setDataError] = useState('');
 
   // Auth Listener
   useEffect(() => {
     const unsubscribe = subscribeToAuth(async (currentUser) => {
       setLoading(true);
+      setDataError('');
+      
       if (currentUser) {
         if (currentUser.email === ALLOWED_EMAIL) {
           // Authorized
           setUser(currentUser);
           setAuthError('');
+          
           try {
             const uid = currentUser.uid;
+            // Use Promise.all to fetch everything in parallel
             const [txs, wls, gls, bgs, dbs] = await Promise.all([
               getTransactions(uid),
               getWallets(uid),
@@ -61,13 +66,24 @@ export default function App() {
               getBudgets(uid),
               getDebts(uid)
             ]);
+            
             setTransactions(txs);
             setWallets(wls);
             setGoals(gls);
             setBudgets(bgs);
             setDebts(dbs);
-          } catch (e) {
-            console.error("Data fetch error", e);
+          } catch (e: any) {
+            console.error("Data fetch error:", e);
+            // Provide user-friendly error
+            let msg = "Failed to load data.";
+            if (e.code === 'failed-precondition') {
+                msg = "Database index missing. Check console.";
+            } else if (e.code === 'permission-denied') {
+                msg = "You do not have permission to access this data.";
+            } else if (e.message) {
+                msg = `Error: ${e.message}`;
+            }
+            setDataError(msg);
           }
         } else {
           // Unauthorized
@@ -112,7 +128,12 @@ export default function App() {
     try {
       const docRef = await addTransaction(user.uid, tx);
       const newTx = { ...tx, id: docRef.id };
-      setTransactions(prev => [newTx, ...prev]);
+      setTransactions(prev => [newTx, ...prev].sort((a, b) => {
+        // Maintain sort order locally
+        const dateA = new Date(`${a.date}T${a.time}`);
+        const dateB = new Date(`${b.date}T${b.time}`);
+        return dateB.getTime() - dateA.getTime();
+      }));
     } catch (e) {
       console.error(e);
       alert('Failed to add transaction');
@@ -193,7 +214,7 @@ export default function App() {
       <div className="flex h-screen w-full items-center justify-center bg-gray-50 dark:bg-dark-bg text-gray-500">
         <div className="animate-pulse flex flex-col items-center">
             <div className="h-8 w-8 bg-primary-500 rounded-full mb-4"></div>
-            Loading Financial Data...
+            <p>Syncing Financial Data...</p>
         </div>
       </div>
     );
@@ -228,6 +249,20 @@ export default function App() {
         </div>
       </div>
     );
+  }
+
+  // Data Fetch Error State
+  if (dataError) {
+     return (
+      <Layout user={user} onLogout={handleLogout}>
+        <div className="flex flex-col items-center justify-center h-[60vh] text-center p-6">
+            <WifiOff size={64} className="text-red-400 mb-4" />
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Unable to Load Data</h2>
+            <p className="text-gray-500 dark:text-gray-400 max-w-md mb-6">{dataError}</p>
+            <Button onClick={() => window.location.reload()}>Try Refreshing</Button>
+        </div>
+      </Layout>
+     )
   }
 
   // Authenticated Router

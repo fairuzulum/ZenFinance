@@ -51,6 +51,10 @@ export const addWallet = async (userId: string, wallet: Omit<Wallet, 'id'>) => {
   return addDoc(collection(db, `users/${userId}/wallets`), wallet);
 };
 
+export const deleteWallet = async (userId: string, walletId: string) => {
+  return deleteDoc(doc(db, `users/${userId}/wallets`, walletId));
+};
+
 // --- Transactions ---
 export const getTransactions = async (userId: string): Promise<Transaction[]> => {
   // FIXED: Only sort by date in Firestore to prevent "Missing Index" error.

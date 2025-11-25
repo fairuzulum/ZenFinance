@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { Wallet, Transaction, WalletType } from '../types';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Plus, CreditCard, Banknote, Landmark } from 'lucide-react';
+import { Plus, CreditCard, Banknote, Landmark, Trash2 } from 'lucide-react';
 
 interface WalletsProps {
   wallets: Wallet[];
   transactions: Transaction[];
   onAdd: (w: Omit<Wallet, 'id'>) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export const Wallets: React.FC<WalletsProps> = ({ wallets, transactions, onAdd }) => {
+export const Wallets: React.FC<WalletsProps> = ({ wallets, transactions, onAdd, onDelete }) => {
   const [showModal, setShowModal] = useState(false);
   const [newWalletName, setNewWalletName] = useState('');
   const [newWalletType, setNewWalletType] = useState<WalletType>('cash');
@@ -54,17 +55,26 @@ export const Wallets: React.FC<WalletsProps> = ({ wallets, transactions, onAdd }
         {wallets.map(wallet => {
           const balance = calculateBalance(wallet.id);
           return (
-            <div key={wallet.id} className="relative overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 text-white shadow-lg">
+            <div key={wallet.id} className="relative overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 text-white shadow-lg group">
               <div className="absolute top-0 right-0 p-4 opacity-10">
                 {getIcon(wallet.type)}
               </div>
-              <div className="flex justify-between items-start mb-8">
+              <div className="flex justify-between items-start mb-8 relative z-10">
                 <div>
                   <h3 className="text-lg font-semibold">{wallet.name}</h3>
                   <p className="text-sm text-gray-400 capitalize">{wallet.type}</p>
                 </div>
-                <div className="p-2 bg-white/10 rounded-lg">
-                  {getIcon(wallet.type)}
+                <div className="flex gap-2">
+                    <button 
+                        onClick={() => onDelete(wallet.id)} 
+                        className="p-2 bg-black/20 hover:bg-red-500/80 text-white/70 hover:text-white rounded-lg transition-all"
+                        title="Delete Wallet"
+                    >
+                        <Trash2 size={20} />
+                    </button>
+                    <div className="p-2 bg-white/10 rounded-lg">
+                        {getIcon(wallet.type)}
+                    </div>
                 </div>
               </div>
               <div>

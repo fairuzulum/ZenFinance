@@ -9,6 +9,7 @@ import {
   getWallets, 
   addTransaction, 
   addWallet, 
+  deleteWallet,
   deleteTransaction, 
   getGoals, 
   addGoal, 
@@ -155,6 +156,14 @@ export default function App() {
       setWallets(prev => [...prev, { ...w, id: docRef.id }]);
   };
 
+  const handleDeleteWallet = async (id: string) => {
+    if (!user) return;
+    if (confirm('Are you sure you want to delete this wallet?')) {
+        await deleteWallet(user.uid, id);
+        setWallets(prev => prev.filter(w => w.id !== id));
+    }
+  };
+
   const handleAddGoal = async (g: Omit<SavingsGoal, 'id'>) => {
       if (!user) return;
       const docRef = await addGoal(user.uid, g);
@@ -286,7 +295,12 @@ export default function App() {
       />;
       break;
     case '/wallets':
-      content = <Wallets wallets={wallets} onAdd={handleAddWallet} transactions={transactions} />;
+      content = <Wallets 
+        wallets={wallets} 
+        onAdd={handleAddWallet} 
+        transactions={transactions} 
+        onDelete={handleDeleteWallet} 
+      />;
       break;
     case '/goals':
       content = <Goals goals={goals} onAdd={handleAddGoal} budgets={budgets} onAddBudget={handleAddBudget} transactions={transactions} />;

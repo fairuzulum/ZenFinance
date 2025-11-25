@@ -59,5 +59,5 @@ export interface FilterState {
 
 export const CATEGORIES = {
   income: ['Salary', 'Freelance', 'Investments', 'Gift', 'Other'],
-  expense: ['Food', 'Transport', 'Housing', 'Entertainment', 'Health', 'Education', 'Shopping', 'Utilities', 'Debt Payment', 'Other']
+  expense: ['Food', 'Drinks', 'Transport', 'Housing', 'Entertainment', 'Health', 'Education', 'Shopping', 'Utilities', 'Debt Payment', 'Other']
 };

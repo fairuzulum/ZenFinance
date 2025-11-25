@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SavingsGoal, Budget, Transaction, CATEGORIES } from '../types';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { CurrencyInput } from '../components/ui/CurrencyInput';
 import { Plus, Target } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -124,9 +125,24 @@ export const Goals: React.FC<GoalsProps> = ({ goals, budgets, transactions, onAd
           <div className="bg-white dark:bg-dark-card rounded-xl p-6 w-full max-w-sm">
             <h2 className="text-xl font-bold mb-4 dark:text-white">New Goal</h2>
             <form onSubmit={handleGoalSubmit} className="space-y-4">
-              <input className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700" placeholder="Goal Name" required value={newGoal.name} onChange={e => setNewGoal({...newGoal, name: e.target.value})} />
-              <input className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700" type="number" placeholder="Target Amount" required value={newGoal.target} onChange={e => setNewGoal({...newGoal, target: e.target.value})} />
-              <input className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700" type="number" placeholder="Current Saved (Optional)" value={newGoal.current} onChange={e => setNewGoal({...newGoal, current: e.target.value})} />
+              <input 
+                className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" 
+                placeholder="Goal Name" 
+                required 
+                value={newGoal.name} 
+                onChange={e => setNewGoal({...newGoal, name: e.target.value})} 
+              />
+              <CurrencyInput 
+                placeholder="Target Amount" 
+                required 
+                value={newGoal.target} 
+                onValueChange={(val) => setNewGoal({...newGoal, target: val})} 
+              />
+              <CurrencyInput 
+                placeholder="Current Saved (Optional)" 
+                value={newGoal.current} 
+                onValueChange={(val) => setNewGoal({...newGoal, current: val})} 
+              />
               <div className="flex gap-2">
                 <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowGoalModal(false)}>Cancel</Button>
                 <Button type="submit" className="flex-1">Save</Button>
@@ -142,10 +158,19 @@ export const Goals: React.FC<GoalsProps> = ({ goals, budgets, transactions, onAd
           <div className="bg-white dark:bg-dark-card rounded-xl p-6 w-full max-w-sm">
              <h2 className="text-xl font-bold mb-4 dark:text-white">Set Monthly Budget</h2>
              <form onSubmit={handleBudgetSubmit} className="space-y-4">
-                <select className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700" value={newBudget.category} onChange={e => setNewBudget({...newBudget, category: e.target.value})}>
+                <select 
+                  className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" 
+                  value={newBudget.category} 
+                  onChange={e => setNewBudget({...newBudget, category: e.target.value})}
+                >
                   {CATEGORIES.expense.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-                <input className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700" type="number" placeholder="Limit Amount" required value={newBudget.amount} onChange={e => setNewBudget({...newBudget, amount: e.target.value})} />
+                <CurrencyInput 
+                  placeholder="Limit Amount" 
+                  required 
+                  value={newBudget.amount} 
+                  onValueChange={(val) => setNewBudget({...newBudget, amount: val})} 
+                />
                 <div className="flex gap-2">
                   <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowBudgetModal(false)}>Cancel</Button>
                   <Button type="submit" className="flex-1">Set</Button>

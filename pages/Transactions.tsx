@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Transaction, Wallet, FilterState, CATEGORIES, TransactionType } from '../types';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { CurrencyInput } from '../components/ui/CurrencyInput';
 import { Plus, Trash2, Filter, Download, Search } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -149,12 +150,24 @@ export const Transactions: React.FC<TransactionsProps> = ({ transactions, wallet
                  value={filters.endTime} onChange={e => setFilters({...filters, endTime: e.target.value})} />
             </div>
              <div className="flex gap-2 items-center md:col-span-2">
-               <span className="text-sm">Amount:</span>
-               <input type="number" placeholder="Min" className="w-full p-2 rounded border dark:bg-dark-card dark:border-dark-border" 
-                 value={filters.minAmount} onChange={e => setFilters({...filters, minAmount: e.target.value})} />
+               <span className="text-sm w-20">Amount:</span>
+               <div className="w-full">
+                 <CurrencyInput 
+                   placeholder="Min" 
+                   className="py-2"
+                   value={filters.minAmount} 
+                   onValueChange={(val) => setFilters({...filters, minAmount: val})} 
+                 />
+               </div>
                <span className="text-sm">-</span>
-               <input type="number" placeholder="Max" className="w-full p-2 rounded border dark:bg-dark-card dark:border-dark-border"
-                 value={filters.maxAmount} onChange={e => setFilters({...filters, maxAmount: e.target.value})} />
+               <div className="w-full">
+                 <CurrencyInput 
+                   placeholder="Max" 
+                   className="py-2"
+                   value={filters.maxAmount} 
+                   onValueChange={(val) => setFilters({...filters, maxAmount: val})} 
+                 />
+               </div>
             </div>
           </div>
         </Card>
@@ -214,7 +227,6 @@ export const Transactions: React.FC<TransactionsProps> = ({ transactions, wallet
                     onClick={() => setFormData({
                       ...formData, 
                       type: t,
-                      // CRITICAL FIX: Reset category when type changes
                       category: CATEGORIES[t][0] 
                     })}
                     className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
@@ -230,12 +242,10 @@ export const Transactions: React.FC<TransactionsProps> = ({ transactions, wallet
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
-                <input 
-                  type="number" 
+                <CurrencyInput 
                   required
-                  className="w-full p-3 rounded-lg border dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                   value={formData.amount}
-                  onChange={e => setFormData({...formData, amount: e.target.value})}
+                  onValueChange={(val) => setFormData({...formData, amount: val})}
                   placeholder="0"
                 />
               </div>

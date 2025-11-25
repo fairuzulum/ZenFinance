@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Debt, Wallet, Transaction } from '../types';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { CurrencyInput } from '../components/ui/CurrencyInput';
 import { Plus, CheckCircle, Clock, AlertCircle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -165,7 +166,12 @@ export const Debts: React.FC<DebtsProps> = ({ debts, wallets, onAdd, onPay, onDe
               </div>
               <div>
                   <label className="block text-sm font-medium mb-1 dark:text-gray-300">Total Amount</label>
-                  <input className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" type="number" placeholder="Rp" required value={newDebt.amount} onChange={e => setNewDebt({...newDebt, amount: e.target.value})} />
+                  <CurrencyInput 
+                    placeholder="Rp" 
+                    required 
+                    value={newDebt.amount} 
+                    onValueChange={(val) => setNewDebt({...newDebt, amount: val})} 
+                  />
               </div>
               <div>
                   <label className="block text-sm font-medium mb-1 dark:text-gray-300">Due Date (Optional)</label>
@@ -188,13 +194,10 @@ export const Debts: React.FC<DebtsProps> = ({ debts, wallets, onAdd, onPay, onDe
             <form onSubmit={handlePaySubmit} className="space-y-4">
               <div>
                   <label className="block text-sm font-medium mb-1 dark:text-gray-300">Payment Amount</label>
-                  <input 
-                    className="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" 
-                    type="number" 
-                    max={showPayModal.maxAmount}
+                  <CurrencyInput 
                     required 
                     value={payData.amount} 
-                    onChange={e => setPayData({...payData, amount: e.target.value})} 
+                    onValueChange={(val) => setPayData({...payData, amount: val})} 
                   />
                   <p className="text-xs text-gray-500 mt-1">Remaining: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(showPayModal.maxAmount)}</p>
               </div>

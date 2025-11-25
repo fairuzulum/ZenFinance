@@ -211,7 +211,12 @@ export const Transactions: React.FC<TransactionsProps> = ({ transactions, wallet
                   <button
                     key={t}
                     type="button"
-                    onClick={() => setFormData({...formData, type: t})}
+                    onClick={() => setFormData({
+                      ...formData, 
+                      type: t,
+                      // CRITICAL FIX: Reset category when type changes
+                      category: CATEGORIES[t][0] 
+                    })}
                     className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
                       formData.type === t 
                         ? (t === 'income' ? 'bg-green-500 text-white' : 'bg-red-500 text-white') 

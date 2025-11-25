@@ -118,3 +118,7 @@ export const updateDebtPayment = async (userId: string, debtId: string, newPaidA
   const ref = doc(db, `users/${userId}/debts`, debtId);
   return updateDoc(ref, { paidAmount: newPaidAmount, isPaid });
 };
+
+export const deleteDebt = async (userId: string, debtId: string) => {
+  return deleteDoc(doc(db, `users/${userId}/debts`, debtId));
+};

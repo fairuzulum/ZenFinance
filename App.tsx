@@ -16,7 +16,8 @@ import {
   addBudget,
   getDebts,
   addDebt,
-  updateDebtPayment
+  updateDebtPayment,
+  deleteDebt
 } from './services/firebase';
 import { Transaction, Wallet, FilterState, SavingsGoal, Budget, Debt } from './types';
 import { Dashboard } from './pages/Dashboard';
@@ -172,6 +173,14 @@ export default function App() {
     setDebts(prev => [...prev, { ...d, id: docRef.id }]);
   };
 
+  const handleDeleteDebt = async (id: string) => {
+    if (!user) return;
+    if (confirm('Delete this debt record?')) {
+        await deleteDebt(user.uid, id);
+        setDebts(prev => prev.filter(d => d.id !== id));
+    }
+  };
+
   const handlePayDebt = async (debtId: string, amount: number, walletId: string) => {
     if (!user) return;
     const debt = debts.find(d => d.id === debtId);
@@ -283,7 +292,13 @@ export default function App() {
       content = <Goals goals={goals} onAdd={handleAddGoal} budgets={budgets} onAddBudget={handleAddBudget} transactions={transactions} />;
       break;
     case '/debts':
-      content = <Debts debts={debts} wallets={wallets} onAdd={handleAddDebt} onPay={handlePayDebt} />;
+      content = <Debts 
+        debts={debts} 
+        wallets={wallets} 
+        onAdd={handleAddDebt} 
+        onPay={handlePayDebt} 
+        onDelete={handleDeleteDebt} 
+      />;
       break;
     case '/settings':
       content = (

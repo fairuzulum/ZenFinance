@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Debt, Wallet, Transaction } from '../types';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Plus, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Plus, CheckCircle, Clock, AlertCircle, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface DebtsProps {
@@ -10,9 +10,10 @@ interface DebtsProps {
   wallets: Wallet[];
   onAdd: (debt: Omit<Debt, 'id'>) => Promise<void>;
   onPay: (debtId: string, amount: number, walletId: string) => Promise<void>;
+  onDelete: (debtId: string) => Promise<void>;
 }
 
-export const Debts: React.FC<DebtsProps> = ({ debts, wallets, onAdd, onPay }) => {
+export const Debts: React.FC<DebtsProps> = ({ debts, wallets, onAdd, onPay, onDelete }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPayModal, setShowPayModal] = useState<{debtId: string, maxAmount: number} | null>(null);
 
@@ -76,7 +77,7 @@ export const Debts: React.FC<DebtsProps> = ({ debts, wallets, onAdd, onPay }) =>
                 return (
                 <Card key={debt.id} className="relative overflow-hidden">
                     <div className="flex justify-between items-start mb-4">
-                        <div>
+                        <div className="flex-1">
                             <h3 className="font-bold text-lg dark:text-white">{debt.title}</h3>
                             {debt.dueDate && (
                                 <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
@@ -84,10 +85,19 @@ export const Debts: React.FC<DebtsProps> = ({ debts, wallets, onAdd, onPay }) =>
                                 </p>
                             )}
                         </div>
-                        <div className="text-right">
-                            <p className="font-bold text-xl text-red-600">
-                                {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(debt.totalAmount)}
-                            </p>
+                        <div className="text-right flex flex-col items-end gap-1">
+                             <div className="flex items-center gap-3">
+                                <p className="font-bold text-xl text-red-600">
+                                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(debt.totalAmount)}
+                                </p>
+                                <button 
+                                  onClick={() => onDelete(debt.id)} 
+                                  className="text-gray-400 hover:text-red-500 transition-colors"
+                                  title="Delete Debt"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                             </div>
                             <p className="text-xs text-gray-400">Total</p>
                         </div>
                     </div>
@@ -120,10 +130,19 @@ export const Debts: React.FC<DebtsProps> = ({ debts, wallets, onAdd, onPay }) =>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {paidDebts.map(debt => (
-                    <div key={debt.id} className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 opacity-75">
+                    <div key={debt.id} className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800 opacity-75 relative group">
                          <div className="flex justify-between items-center mb-2">
                             <h3 className="font-bold dark:text-white line-through decoration-gray-400">{debt.title}</h3>
-                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-bold">LUNAS</span>
+                            <div className="flex items-center gap-2">
+                              <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-bold">LUNAS</span>
+                              <button 
+                                onClick={() => onDelete(debt.id)} 
+                                className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                                title="Delete Record"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                          </div>
                          <p className="text-gray-500 dark:text-gray-400 text-sm">
                              Total: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(debt.totalAmount)}
